@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Soccer Analytics</title>
+</head>
+<body>
+	<h1>Soccer Analytics Dashboard</h1>
+	
+	<h2>Add Player</h2>
+	
+	<form action="/add" method="POST">
+		<input name="name" placeholder="Player Name" required>
+		<input name="goals" type="number" placeholder="Goals" required>
+		<input name="assists" type="number" placeholder="Assists" required>
+		<select name="team">
+			<option value="Team A">Team A</option>
+			<option value="Team B">Team B</option>
+		</select>
+		<button type="submit">Add Player</button>
+	</form>
+	
+	<hr>
+	
+	<h2>Players</h2>
+	
+	<table boarder="1">
+		<tr>
+			<th>ID</th>
+			<th>Name</th>
+			<th>Goals</th>
+			<th>Assists</th>
+			<th>Team</>
+			<th>Delete</th>
+		</tr>
+	
+
+		{% for player in players %}
+		<tr>
+			<td>{{ player.id }}</td>
+			<td>{{ player.name }}</td>
+			<td>{{ player.goals }}</td>
+			<td>{{ player.assists }}</td>
+			<td>{{ player.team }}</td>
+			<td>
+				<a href="/delete/{{ player.id }}">Delete</a>
+				<a href="/edit/{{ player.id }}">Edit</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<h2>Add Match</h2>
+
+	<form action="/add_match" method="POST">
+		<input name="opponent" placeholder="Opponent" required>
+		<input name="team_goals" type="number" placeholder="Our Goals" required>
+		<input name="opponent_goals" type="number" placeholder="Opponent Goals" required>
+
+		<button type="submit">Add Match</button>
+	</form>
+
+	<h2>Matches</h2>
+
+	<table boarder="1">
+	
+		<tr>
+			<th>ID</th>
+			<th>Opponent</th>
+			<th>Our Goals</th>
+			<th>Opponent Goals</th>
+		<tr>
+
+		{% for match in matches %}
+		<tr>
+
+			<td>{{ match.id }}</td>
+			<td>{{ match.opponent }}</td>
+			<td>{{ match.team_goals }}</td>
+			<td>{{ match.opponent_goals }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+	
+	<h2>Team Statistics</h2>
+	
+	<p>Total Matches: {{ total_matches }}</p>
+	<p>Total Goals: {{ total_goals }}</p>
+	<p>Wins: {{ wins }}</p>
+	<p>Losses: {{ losses }}</p>
+	<p>Draws: {{ draws }}</p>
+	<p>Goal Differential: {{ goal_differential }}</p>
+	<p>Win Percentage: {{ "%.1f"|format(win_percentage) }}</p>
+
+	<h2>Player Statistics</h2>
+	
+	{% if top_scorer%}
+	<p>
+	Top Scorer:
+	{{ top_scorer.name }}
+	({{ top_scorer.goals }} goals)
+	</p>
+	{% endif %}	
+
+</body>
+</html>
+

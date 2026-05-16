@@ -1,0 +1,12 @@
+<h2>Edit Player</h2>
+
+<form action="/update/{{ player.id }}" method="POST">
+	<input name="name" value="{{ player.name }}">
+	<input name="goals" value="{{ player.goals}}">
+	<input name="assists" value="{{ player.assists }}">
+	<select name="team">
+		<option value="Team A" {% if player.team == "Team A" %}selected{% endif %}>Team A</option>
+		<option value="Team B" {% if player.team == "Team B" %}selected{% endif %}>Team B</option>
+	</select>
+	<button type="submit">Update</button>
+</form>
