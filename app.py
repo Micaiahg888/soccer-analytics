@@ -37,13 +37,24 @@ def home():
 	else:
 		win_percentage = 0
 	
-	top_scorer = None
+	
 	
 	if players:
-		top_scorer = max(players, key=lambda p: p["goals"])
+		max_goals = max(p["goals"] for p in players) 
+		top_scorers = [p for p in players if p["goals"] == max_goals]
+	else: 
+		top_scorers = []
 	
+	
+
+	if players:
+		max_assists = max(p["assists"] for p in players) 
+		top_assisters = [p for p in players if p["assists"] == max_assists]
+	else: 
+		top_assisters = []
+
 	return render_template("index.html", players=players, matches=matches, total_matches=total_matches, total_goals=total_goals, goal_differential=goal_differential, 
-win_percentage=win_percentage, top_scorer =top_scorer)
+win_percentage=win_percentage, top_scorers=top_scorers, top_assisters=top_assisters)
 
 @app.route("/add", methods=["POST"])
 def add_player():

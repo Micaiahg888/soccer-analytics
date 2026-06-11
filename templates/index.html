@@ -93,13 +93,19 @@
 
 	<h2>Player Statistics</h2>
 	
-	{% if top_scorer%}
-	<p>
-	Top Scorer:
-	{{ top_scorer.name }}
-	({{ top_scorer.goals }} goals)
-	</p>
-	{% endif %}	
+	<h2>Top Scorers</h2>
+	
+	{% for player in top_scorers %}
+	<p>{{ player.name }} - {{ player.goals }} goals</p>
+	{% endfor %}
+
+
+
+	<h2>Top Assisters</h2>
+	
+	{% for player in top_assisters %}
+	<p>{{ player.name }} - {{ player.assists }} assists</p>
+	{% endfor %}	
 
 </body>
 </html>
