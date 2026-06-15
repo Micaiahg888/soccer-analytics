@@ -1,12 +1,11 @@
 
-
-
-
 from flask import Flask, render_template, request, redirect
+
+from database import get_db
 
 app = Flask(__name__)
 
-players = []
+
 next_id = 1
 teams = ["Team A", "Team B"]
 matches = []
@@ -15,6 +14,15 @@ next_match_id = 1
 
 @app.route("/")
 def home():
+
+	conn = get_db()
+	
+	players = conn.execute(
+		"SELECT * FROM players"
+	).fetchall()
+	
+	conn.close
+
 	total_matches = len(matches)
 	total_goals = sum(match["team_goals"] for match in matches)
 
@@ -65,52 +73,77 @@ def add_player():
 	assists = int(request.form["assists"])
 	team = request.form["team"]
 
-	players.append({
-		"id" : next_id,
-		"name" : name,
-		"goals" : goals,
-		"assists" : assists,
-		"team" : team
-	})
+	conn = get_db()
+
+	conn.execute(
+		"""
+		INSERT INTO players (name, goals, assists)
+		VALUES (?, ?, ?)
+		""",
+		(
+			name,
+			goals,
+			assists
+		)
+	)
+	conn.commit()
+	conn.close()
 
 	next_id += 1
-	print(players)
+	
 
 
 	return redirect("/")
 
 @app.route("/delete/<int:player_id>")
 def delete_player(player_id):
-	global players
 	
-	new_list = []
+	conn = get_db()
+	
+	conn.execute(
+		"DELETE FROM players WHERE id = ?",
+		(player_id,)
+	)
 
-	for p in players:
-		if p["id"] != player_id:
-			new_list.append(p)
-	players = new_list	
+	conn.commit()
+	conn.close()
 
 	return redirect("/")
 
 @app.route("/edit/<int:player_id>")
 def edit_player(player_id):
-	player_to_edit = None
+	
+	conn = get_db()
+	
+	player = conn.execute(
+		"SELECT * FROM players WHERE id = ?",
+		(player_id,)
+	).fetchone()
 
-	for p in players:
-		if p["id"] == player_id:
-			player_to_edit = p
-			break
+	conn.close()
 
-	return render_template("edit.html", player=player_to_edit)
+
+	return render_template("edit.html", player=player)
 
 @app.route("/update/<int:player_id>", methods=["POST"])
 def update_player(player_id):
-	for p in players:
-		if p["id"] == player_id:
-			p["name"] = request.form["name"]
-			p["goals"] = int(request.form["goals"])
-			p["assists"] = int(request.form["assists"])
-			p["team"] = request.form["team"]
+	name = request.form["name"]
+	goals = request.form["goals"]
+	assists = request.form["assists"]
+
+	conn = get_db()
+
+	conn.execute(
+		"""
+		UPDATE players
+		SET name = ?, goals = ?, assists = ?
+		WHERE id = ?
+		""", 
+		(name, goals, assists, player_id)
+	)
+
+	conn.commit()
+	conn.close()
 
 
 	return redirect("/")
