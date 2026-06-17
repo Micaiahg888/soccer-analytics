@@ -9,11 +9,21 @@ def create_tables():
 	conn = get_db()
 	
 	conn.execute("""
+	CREATE TABLE IF NOT EXISTS teams (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL
+	)
+	""")
+
+
+	conn.execute("""
 	CREATE TABLE IF NOT EXISTS players (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		team_id INTEGER,
 		name TEXT NOT NULL,
 		goals INTEGER,
-		assists INTEGER
+		assists INTEGER,
+		FOREIGN KEY(team_id) REFERENCES teams(id)
 	)
 	""")
 

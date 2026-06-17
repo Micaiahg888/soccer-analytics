@@ -88,11 +88,7 @@ def add_player():
 	)
 	conn.commit()
 	conn.close()
-
-	next_id += 1
 	
-
-
 	return redirect("/")
 
 @app.route("/delete/<int:player_id>")
@@ -161,6 +157,23 @@ def add_match():
 	next_match_id += 1
 			
 	return redirect("/")
+
+@app.route("/add_team", methods=["POST"])
+def add_team():
+	
+	name = request.form["name"]
+	conn = get_db()
+
+	conn.execute(
+		"INSERT INTO teams (name) VALUES (?)",
+		(name,)
+	)
+
+	conn.commit()
+	conn.close()
+
+	return redirect("/")
+
 
 
 if __name__ == "__main__":
