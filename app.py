@@ -7,7 +7,6 @@ app = Flask(__name__)
 
 
 next_id = 1
-teams = ["Team A", "Team B"]
 matches = []
 next_match_id = 1
 
@@ -17,15 +16,20 @@ def home():
 
 	conn = get_db()
 	
+	# Get Players
 	players = conn.execute(
 		"SELECT * FROM players"
 	).fetchall()
 	
-	conn.close
+	# Get Teams
+	teams = conn.execute(
+		"SELECT * FROM teams"
+	).fetchall()
 
 	total_matches = len(matches)
 	total_goals = sum(match["team_goals"] for match in matches)
 
+	# stats
 	wins = 0
 	losses = 0
 	draws = 0
@@ -47,40 +51,49 @@ def home():
 	
 	
 	
-	if players:
-		max_goals = max(p["goals"] for p in players) 
-		top_scorers = [p for p in players if p["goals"] == max_goals]
-	else: 
-		top_scorers = []
+	top_scorers = conn.execute(
+		"""
+		SELECT *
+		FROM players
+		ORDER BY goals DESC
+		LIMIT 5
+		"""
+	).fetchall()
 	
 	
 
-	if players:
-		max_assists = max(p["assists"] for p in players) 
-		top_assisters = [p for p in players if p["assists"] == max_assists]
-	else: 
-		top_assisters = []
+	top_assisters = conn.execute(
+		"""
+		SELECT * 
+		FROM players
+		ORDER by assists DESC
+		LIMIT 5
+		"""
+	).fetchall()
 
-	return render_template("index.html", players=players, matches=matches, total_matches=total_matches, total_goals=total_goals, goal_differential=goal_differential, 
+	conn.close()
+
+	return render_template("index.html", players=players, teams=teams, matches=matches, total_matches=total_matches, total_goals=total_goals, goal_differential=goal_differential, 
 win_percentage=win_percentage, top_scorers=top_scorers, top_assisters=top_assisters)
 
-@app.route("/add", methods=["POST"])
+@app.route("/add_player", methods=["POST"])
 def add_player():
 	global next_id, players
 
 	name = request.form["name"]
 	goals = int(request.form["goals"])
 	assists = int(request.form["assists"])
-	team = request.form["team"]
+	team_id = request.form["team_id"]
 
 	conn = get_db()
 
 	conn.execute(
 		"""
-		INSERT INTO players (name, goals, assists)
-		VALUES (?, ?, ?)
+		INSERT INTO players (team_id, name, goals, assists)
+		VALUES (?, ?, ?, ?)
 		""",
-		(
+		(	
+			team_id,
 			name,
 			goals,
 			assists
