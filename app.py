@@ -18,7 +18,13 @@ def home():
 	
 	# Get Players
 	players = conn.execute(
-		"SELECT * FROM players"
+		"""
+		SELECT players.*, teams.name AS team_name
+		FROM players
+		JOIN teams
+		ON players.team_id = teams.id
+		"""
+
 	).fetchall()
 	
 	# Get Teams
@@ -76,6 +82,38 @@ def home():
 	return render_template("index.html", players=players, teams=teams, matches=matches, total_matches=total_matches, total_goals=total_goals, goal_differential=goal_differential, 
 win_percentage=win_percentage, top_scorers=top_scorers, top_assisters=top_assisters)
 
+
+@app.route("/team/<int:team_id>")
+def team_page(team_id):
+	conn = get_db()
+	
+	team = conn.execute(
+		"""
+		SELECT *
+		FROM teams
+		WHERE id = ?
+		""",
+		(team_id,)
+	).fetchone()
+
+	players = conn.execute(
+		"""
+		SELECT *
+		FROM players
+		WHERE team_id = ?
+		""",
+		(team_id,)
+	).fetchall()
+	
+	conn.close()
+
+	return render_template(
+		"team.html",
+		team=team,
+		players=players
+	)
+
+
 @app.route("/add_player", methods=["POST"])
 def add_player():
 	global next_id, players
@@ -119,20 +157,48 @@ def delete_player(player_id):
 
 	return redirect("/")
 
-@app.route("/edit/<int:player_id>")
+@app.route("/edit/<int:player_id>", methods=["GET", "POST"])
 def edit_player(player_id):
 	
 	conn = get_db()
 	
+	if request.method == "POST":
+
+		name = request.form["name"]
+		team_id = request.form["team_id"]
+		goals = request.form["goals"]
+		assists = request.form["assists"]
+		
+	
+		conn.execute(
+			"""
+			UPDATE players
+			SET name = ?, team_id = ?, goals = ?, assists = ?
+			WHERE id = ?
+			""",
+			(name, team_id, goals, assists, player_id)
+		)
+		
+		conn.commit()
+		conn.close()
+		
+		return redirect("/")
+
 	player = conn.execute(
 		"SELECT * FROM players WHERE id = ?",
 		(player_id,)
 	).fetchone()
 
+	teams = conn.execute(
+		"SELECT * FROM teams"
+	).fetchall()
+
 	conn.close()
+	
+	
 
 
-	return render_template("edit.html", player=player)
+	return render_template("edit.html", player=player, teams=teams)
 
 @app.route("/update/<int:player_id>", methods=["POST"])
 def update_player(player_id):

@@ -46,7 +46,11 @@
 	</td>
 
 	<td>
-		{{ team.name }}
+	
+	<a href="/team/{{ team.id }}">
+	{{ team.name }}
+	</a>
+
 	</td>
 
 </tr>
@@ -109,6 +113,7 @@
 <tr>
 	<th>ID</th>
 	<th>Name</th>
+	<th>Team</th>
 	<th>Goals</th>
 	<th>Assists</th>
 	<th>Actions</th>
@@ -123,6 +128,10 @@
 
 	<td>
 		{{ player.name }}
+	</td>
+
+	<td>
+		{{ player.team_name }}
 	</td>
 
 	<td>
