@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>{{ team.name }}</title>
+</head>
+
+<body>
+
+<h1>
+{{ team.name }}
+</h1>
+
+<h2>Roster</h2>
+
+<table border="1">
+
+<tr>
+<th>Name</th>
+<th>Goals</th>
+<th>Assists</th>
+</tr>
+
+{% for player in players %}
+
+<tr>
+
+<td>
+{{ player.name }}
+</td>
+
+<td>
+{{ player.goals }}
+</td>
+
+<td>
+{{ player.assists }}
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<a href="/">
+Back Home
+</a>
+
+</body>
+
+</html>
+

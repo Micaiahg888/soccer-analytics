@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Soccer Analytics</title>
+</head>
+
+<body>
+
+<h1>Soccer Analytics Dashboard</h1>
+	
+<h2>Add Team</h2>
+
+<form method="POST" action="/add_team">
+
+	<input
+		type="text"
+		name="name"
+		placeholder="Team name"
+		required
+	>
+
+	<button type="submit">
+		Add Team
+	</button>
+
+</form>
+
+<hr>
+
+<h2>Teams</h2>
+
+<table border="1">
+
+<tr>
+	<th>ID</th>
+	<th>Team Name</th>
+</tr>
+
+{% for team in teams%}
+
+<tr>
+	<td>
+		{{ team.id }}
+	</td>
+
+	<td>
+	
+	<a href="/team/{{ team.id }}">
+	{{ team.name }}
+	</a>
+
+	</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<hr>
+
+<h2>Add Player</h2>
+
+<form method="POST" action="/add_player">
+
+	<input
+		type="text"
+		name="name"
+		placeholder="Player name"
+		required
+	>
+
+	<select name="team_id">
+
+		{% for team in teams %}
+		
+		<option value="{{ team.id }}">
+			{{ team.name }}
+		</option>
+
+		{% endfor %}
+
+	</select>
+	
+	<input
+		type="number"
+		name="goals"
+		placeholder="Goals"
+	>
+
+	<input
+		type="number"
+		name="assists"
+		placeholder="Assists"
+	>
+
+	<button type="submit">
+		
+		Add Player
+	</button>
+
+</form>
+
+
+<hr>
+
+<h2>Players</h2>
+
+<table boorder="1">
+
+<tr>
+	<th>ID</th>
+	<th>Name</th>
+	<th>Team</th>
+	<th>Goals</th>
+	<th>Assists</th>
+	<th>Actions</th>
+</tr>
+
+{% for player in players %}
+
+<tr>
+	<td>
+		{{ player.id }}
+	</td>
+
+	<td>
+		{{ player.name }}
+	</td>
+
+	<td>
+		{{ player.team_name }}
+	</td>
+
+	<td>
+		{{ player.goals }}
+	</td>
+
+	<td>
+		{{ player.assists }}
+	</td>
+
+	<td>
+
+		<a href="/edit/{{ player.id }}">
+			Edit
+		</a>
+
+		|
+
+		<a href="/delete/{{ player.id }}">
+			Delete
+		</a>
+
+	</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+
+</html>
