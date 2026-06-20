@@ -1,3 +1,10 @@
 venv/
 __pycache__/
 *.pyc
+
+# database
+soccer.db
+*.db
+
+# PyCharm / IDE files
+.idea/
