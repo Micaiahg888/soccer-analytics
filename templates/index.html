@@ -108,7 +108,7 @@
 
 <h2>Players</h2>
 
-<table boorder="1">
+<table border="1">
 
 <tr>
 	<th>ID</th>
@@ -159,6 +159,119 @@
 </tr>
 
 {% endfor %}
+
+</table>
+
+<hr>
+
+<h2>Add Match</h2>
+
+<form method="POST" action="/add_match">
+
+    <label>Team</label>
+    <select name="team_id" required>
+
+        {% for team in teams %}
+        <option value="{{ team.id }}">
+            {{ team.name }}
+        </option>
+        {% endfor %}
+
+    </select>
+
+
+    <br><br>
+
+    <input
+        type="text"
+        name="opponent"
+        placeholder="Opponent"
+        required
+    >
+
+    <br><br>
+
+    <input
+        type="date"
+        name="date"
+        required
+    >
+
+    <br><br>
+
+    <input
+        type="number"
+        name="team_score"
+        placeholder="Your Score"
+        required
+    >
+
+    <br><br>
+
+    <input
+        type="number"
+        name="opponent_score"
+        placeholder="Opponent Score"
+        required
+    >
+
+    <br><br>
+
+    <button type="submit">
+        Add Match
+    </button>
+
+</form>
+
+<hr>
+
+
+<h2>Matches</h2>
+
+
+<table border="1">
+
+<tr>
+
+	<th>Team</th>
+	<th>Opponent</th>
+	<th>Date</th>
+	<th>Score</th>
+
+</tr>
+
+
+{% for match in matches %}
+
+<tr>
+
+	<td>
+		{{ match.team_name }}
+	</td>
+
+
+	<td>
+		{{ match.opponent }}
+	</td>
+
+
+	<td>
+		{{ match.date }}
+	</td>
+
+
+	<td>
+		{{ match.team_score }}
+		-
+		{{ match.opponent_score }}
+	</td>
+
+
+</tr>
+
+
+{% endfor %}
+
 
 </table>
 
