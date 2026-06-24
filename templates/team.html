@@ -2,24 +2,75 @@
 <html>
 
 <head>
-<title>{{ team.name }}</title>
+    <title>{{ team.name }} Analytics</title>
 </head>
+
 
 <body>
 
-<h1>
-{{ team.name }}
-</h1>
 
-<h2>Roster</h2>
+<h1>{{ team.name }}</h1>
+
+
+<hr>
+
+
+<h2>Team Statistics</h2>
+
+
+<p>
+Matches Played:
+{{ matches|length }}
+</p>
+
+
+<p>
+Wins:
+{{ wins }}
+</p>
+
+
+<p>
+Losses:
+{{ losses }}
+</p>
+
+
+<p>
+Draws:
+{{ draws }}
+</p>
+
+
+<p>
+Goals Scored:
+{{ goals }}
+</p>
+
+
+<p>
+Win Percentage:
+{{ "%.1f"|format(win_percentage) }}%
+</p>
+
+
+
+<hr>
+
+
+<h2>Players</h2>
+
 
 <table border="1">
 
+
 <tr>
-<th>Name</th>
-<th>Goals</th>
-<th>Assists</th>
+    <th>Name</th>
+    <th>Goals</th>
+    <th>Assists</th>
 </tr>
+
+
 
 {% for player in players %}
 
@@ -29,25 +80,89 @@
 {{ player.name }}
 </td>
 
+
 <td>
 {{ player.goals }}
 </td>
+
 
 <td>
 {{ player.assists }}
 </td>
 
+
 </tr>
+
 
 {% endfor %}
 
+
 </table>
 
+
+
+<hr>
+
+
+
+<h2>Matches</h2>
+
+
+<table border="1">
+
+
+<tr>
+
+<th>Opponent</th>
+<th>Date</th>
+<th>Score</th>
+
+</tr>
+
+
+
+{% for match in matches %}
+
+
+<tr>
+
+<td>
+{{ match.opponent }}
+</td>
+
+
+<td>
+{{ match.date }}
+</td>
+
+
+<td>
+{{ match.team_score }}
+-
+{{ match.opponent_score }}
+</td>
+
+
+</tr>
+
+
+{% endfor %}
+
+
+
+</table>
+
+
+
+<br>
+
+
 <a href="/">
-Back Home
+Back to Dashboard
 </a>
+
+
 
 </body>
 
 </html>
-

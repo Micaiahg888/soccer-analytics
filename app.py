@@ -110,6 +110,9 @@ def home():
         matches=matches,
         total_matches=total_matches,
         total_goals=total_goals,
+		wins=wins,
+		losses=losses,
+		draws=draws,
         goal_differential=goal_differential,
         win_percentage=win_percentage,
         top_scorers=top_scorers,
@@ -118,38 +121,97 @@ def home():
 
 @app.route("/team/<int:team_id>")
 def team_page(team_id):
-	conn = get_db()
-	
-	team = conn.execute(
-		"""
-		SELECT *
-		FROM teams
-		WHERE id = ?
-		""",
-		(team_id,)
-	).fetchone()
 
-	players = conn.execute(
-		"""
-		SELECT *
-		FROM players
-		WHERE team_id = ?
-		""",
-		(team_id,)
-	).fetchall()
-	
-	conn.close()
+    conn = get_db()
 
-	return render_template(
-		"team.html",
-		team=team,
-		players=players
-	)
 
+    # Get team
+    team = conn.execute(
+        """
+        SELECT *
+        FROM teams
+        WHERE id = ?
+        """,
+        (team_id,)
+    ).fetchone()
+
+
+
+    # Get players
+    players = conn.execute(
+        """
+        SELECT *
+        FROM players
+        WHERE team_id = ?
+        """,
+        (team_id,)
+    ).fetchall()
+
+
+
+    # Get team matches
+    matches = conn.execute(
+        """
+        SELECT *
+        FROM matches
+        WHERE team_id = ?
+        """,
+        (team_id,)
+    ).fetchall()
+
+
+
+    # Stats
+    wins = 0
+    losses = 0
+    draws = 0
+    goals = 0
+
+
+    for match in matches:
+
+        goals += match["team_score"]
+
+
+        if match["team_score"] > match["opponent_score"]:
+            wins += 1
+
+        elif match["team_score"] < match["opponent_score"]:
+            losses += 1
+
+        else:
+            draws += 1
+
+
+
+    total_matches = len(matches)
+
+
+    if total_matches > 0:
+        win_percentage = (wins / total_matches) * 100
+    else:
+        win_percentage = 0
+
+
+
+    conn.close()
+
+
+
+    return render_template(
+        "team.html",
+        team=team,
+        players=players,
+        matches=matches,
+        wins=wins,
+        losses=losses,
+        draws=draws,
+        goals=goals,
+        win_percentage=win_percentage
+    )
 
 @app.route("/add_player", methods=["POST"])
 def add_player():
-	global next_id, players
 
 	name = request.form["name"]
 	goals = int(request.form["goals"])
@@ -259,33 +321,37 @@ def update_player(player_id):
 @app.route("/add_match", methods=["POST"])
 def add_match():
 
-    team_id = request.form.get("team_id")
-    opponent = request.form.get("opponent")
-    date = request.form.get("date")
-    team_score = request.form.get("team_score")
-    opponent_score = request.form.get("opponent_score")
+	team_id = request.form.get("team_id")
+	opponent = request.form.get("opponent")
+	date = request.form.get("date")
+	location = request.form.get("location")
+	season = request.form.get("season")
+	team_score = request.form.get("team_score")
+	opponent_score = request.form.get("opponent_score")
 
-    conn = get_db()
+	conn = get_db()
 
-    conn.execute(
+	conn.execute(
         """
         INSERT INTO matches
-        (team_id, opponent, date, team_score, opponent_score)
-        VALUES (?, ?, ?, ?, ?)
+        (team_id, opponent, date, location, season, team_score, opponent_score)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         """,
         (
             team_id,
             opponent,
             date,
+			location,
+			season,
             team_score,
             opponent_score
         )
     )
 
-    conn.commit()
-    conn.close()
+	conn.commit()
+	conn.close()
 
-    return redirect("/")
+	return redirect("/")
 
 @app.route("/add_team", methods=["POST"])
 def add_team():
