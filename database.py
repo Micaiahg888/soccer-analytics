@@ -31,20 +31,6 @@ def create_tables():
     """)
 
     conn.execute("""
-    CREATE TABLE IF NOT EXISTS player_stats (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        player_id INTEGER,
-        match_id INTEGER,
-        goals INTEGER DEFAULT 0,
-        assists INTEGER DEFAULT 0,
-        minutes INTEGER DEFAULT 0,
-        FOREIGN KEY(player_id) REFERENCES players(id),
-        FOREIGN KEY(match_id) REFERENCES matches(id)
-
-    )
-    """)
-
-    conn.execute("""
     CREATE TABLE IF NOT EXISTS matches (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         team_id INTEGER,
@@ -58,6 +44,19 @@ def create_tables():
 
     )
     """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS player_stats (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            player_id INTEGER,
+            match_id INTEGER,
+            goals INTEGER DEFAULT 0,
+            assists INTEGER DEFAULT 0,
+            minutes INTEGER DEFAULT 0,
+            FOREIGN KEY(player_id) REFERENCES players(id),
+            FOREIGN KEY(match_id) REFERENCES matches(id)
+        )
+        """)
 
 
     conn.commit()

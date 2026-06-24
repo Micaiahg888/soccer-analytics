@@ -1,10 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<h1>{{ player.name }}</h1>
+
+<h2>Match Stats</h2>
+
+<table border="1">
+
+<tr>
+    <th>Opponent</th>
+    <th>Date</th>
+    <th>Goals</th>
+    <th>Assists</th>
+    <th>Minutes</th>
+</tr>
+
+{% for s in stats %}
+<tr>
+    <td>{{ s.opponent }}</td>
+    <td>{{ s.date }}</td>
+    <td>{{ s.goals }}</td>
+    <td>{{ s.assists }}</td>
+    <td>{{ s.minutes }}</td>
+</tr>
+{% endfor %}
+
+</table>

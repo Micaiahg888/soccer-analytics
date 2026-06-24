@@ -127,7 +127,9 @@
 	</td>
 
 	<td>
-		{{ player.name }}
+		<a href="/player/{{ player.id }}">
+			{{ player.name }}
+		</a>
 	</td>
 
 	<td>
@@ -256,6 +258,8 @@
 	<th>Opponent</th>
 	<th>Date</th>
 	<th>Score</th>
+	<th>Location</th>
+	<th>Season</th>
 
 </tr>
 
@@ -278,13 +282,19 @@
 		{{ match.date }}
 	</td>
 
-
 	<td>
 		{{ match.team_score }}
 		-
 		{{ match.opponent_score }}
 	</td>
 
+	<td>
+		{{ match.location }}
+	</td>
+
+	<td>
+		{{ match.season }}
+	</td>
 
 </tr>
 
@@ -295,6 +305,14 @@
 </table>
 
 <hr>
+
+<h2>Player Performance</h2>
+
+<a href="/add_stat">
+    ➕ Add Player Stat
+</a>
+
+
 
 
 </body>

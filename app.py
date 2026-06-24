@@ -369,6 +369,64 @@ def add_team():
 
 	return redirect("/")
 
+@app.route("/add_stat")
+def add_stat_page():
+
+    conn = get_db()
+
+    players = conn.execute("SELECT * FROM players").fetchall()
+    matches = conn.execute("SELECT * FROM matches").fetchall()
+
+    conn.close()
+
+    return render_template(
+        "add_stat.html",
+        players=players,
+        matches=matches
+    )
+
+@app.route("/add_stat", methods=["POST"])
+def add_stat():
+
+    player_id = request.form["player_id"]
+    match_id = request.form["match_id"]
+    goals = request.form["goals"]
+    assists = request.form["assists"]
+    minutes = request.form["minutes"]
+
+    conn = get_db()
+
+    conn.execute("""
+        INSERT INTO player_stats
+        (player_id, match_id, goals, assists, minutes)
+        VALUES (?, ?, ?, ?, ?)
+    """, (player_id, match_id, goals, assists, minutes))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/")
+
+@app.route("/player/<int:player_id>")
+def player_page(player_id):
+
+    conn = get_db()
+
+    player = conn.execute(
+        "SELECT * FROM players WHERE id = ?",
+        (player_id,)
+    ).fetchone()
+
+    stats = conn.execute("""
+        SELECT player_stats.*, matches.opponent, matches.date
+        FROM player_stats
+        JOIN matches ON player_stats.match_id = matches.id
+        WHERE player_stats.player_id = ?
+    """, (player_id,)).fetchall()
+
+    conn.close()
+
+    return render_template("player.html", player=player, stats=stats)
 
 
 if __name__ == "__main__":
