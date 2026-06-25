@@ -1,0 +1,47 @@
+<h1>Edit Player</h1>
+
+
+<form method="POST">
+
+
+<input
+
+name="name"
+
+value="{{player.name}}"
+
+>
+
+
+<select name="team_id">
+
+
+{% for team in teams %}
+
+<option
+
+value="{{team.id}}"
+
+{% if team.id == player.team_id %}
+selected
+{% endif %}
+
+>
+
+{{team.name}}
+
+</option>
+
+
+{% endfor %}
+
+
+</select>
+
+
+<button>
+Save
+</button>
+
+
+</form>

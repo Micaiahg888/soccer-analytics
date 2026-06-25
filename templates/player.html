@@ -1,25 +1,212 @@
-<h1>{{ player.name }}</h1>
+<!DOCTYPE html>
 
-<h2>Match Stats</h2>
+<html>
+
+<body>
+
+
+<h1>
+
+{{player.name}}
+
+</h1>
+
+
+<h3>
+
+Team: {{player.team_name}}
+
+</h3>
+
+
+
+<a href="/edit/{{player.id}}">
+
+Edit Player
+
+</a>
+
+
+<hr>
+
+
+
+<h2>Career Stats</h2>
+
 
 <table border="1">
 
+
 <tr>
-    <th>Opponent</th>
-    <th>Date</th>
-    <th>Goals</th>
-    <th>Assists</th>
-    <th>Minutes</th>
+
+<th>Games</th>
+
+<th>Goals</th>
+
+<th>Assists</th>
+
+<th>Minutes</th>
+
 </tr>
 
-{% for s in stats %}
+
 <tr>
-    <td>{{ s.opponent }}</td>
-    <td>{{ s.date }}</td>
-    <td>{{ s.goals }}</td>
-    <td>{{ s.assists }}</td>
-    <td>{{ s.minutes }}</td>
+
+
+<td>
+{{totals.games}}
+</td>
+
+
+<td>
+{{totals.goals or 0}}
+</td>
+
+
+<td>
+{{totals.assists or 0}}
+</td>
+
+
+<td>
+{{totals.minutes or 0}}
+</td>
+
+
 </tr>
-{% endfor %}
+
 
 </table>
+
+
+
+
+<br>
+
+
+<a href="/add_stat">
+
+Add Performance
+
+</a>
+
+
+
+<hr>
+
+
+
+<h2>Performance</h2>
+
+
+<table border="1">
+
+
+<tr>
+
+<th>Opponent</th>
+
+<th>Date</th>
+
+<th>Season</th>
+
+<th>Location</th>
+
+<th>Goals</th>
+
+<th>Assists</th>
+
+<th>Minutes</th>
+
+<th>Actions</th>
+
+
+</tr>
+
+
+
+
+{% for stat in stats %}
+
+
+
+<tr>
+
+
+<td>
+{{stat.opponent}}
+</td>
+
+
+<td>
+{{stat.date}}
+</td>
+
+
+<td>
+{{stat.season}}
+</td>
+
+
+<td>
+{{stat.location}}
+</td>
+
+
+<td>
+{{stat.goals}}
+</td>
+
+
+<td>
+{{stat.assists}}
+</td>
+
+
+<td>
+{{stat.minutes}}
+</td>
+
+
+<td>
+
+
+<a href="/edit_stat/{{stat.id}}">
+Edit
+</a>
+
+
+|
+
+<a href="/delete_stat/{{stat.id}}">
+Delete
+</a>
+
+
+</td>
+
+
+</tr>
+
+
+
+{% endfor %}
+
+
+</table>
+
+
+<br>
+
+
+<a href="/">
+
+Back
+
+</a>
+
+
+
+</body>
+
+</html>

@@ -1,37 +1,179 @@
 <!DOCTYPE html>
+
 <html>
+
+<head>
+
+<title>Add Player Performance</title>
+
+</head>
+
 
 <body>
 
-<h1>Add Player Performance</h1>
+
+<h1>Soccer Analytics</h1>
+
+
+<h2>Add Player Performance</h2>
+
 
 <form method="POST" action="/add_stat">
 
-    <h3>Player</h3>
-    <select name="player_id">
-        {% for player in players %}
-        <option value="{{ player.id }}">
-            {{ player.name }}
-        </option>
-        {% endfor %}
-    </select>
 
-    <h3>Match</h3>
-    <select name="match_id">
-        {% for match in matches %}
-        <option value="{{ match.id }}">
-            {{ match.opponent }} - {{ match.date }}
-        </option>
-        {% endfor %}
-    </select>
+<h3>Player</h3>
 
-    <input type="number" name="goals" placeholder="Goals">
-    <input type="number" name="assists" placeholder="Assists">
-    <input type="number" name="minutes" placeholder="Minutes">
 
-    <button type="submit">Save Performance</button>
+<select name="player_id" required>
+
+
+{% for player in players %}
+
+
+<option value="{{player.id}}">
+
+
+{{player.name}}
+
+
+</option>
+
+
+{% endfor %}
+
+
+</select>
+
+
+
+
+<h3>Match</h3>
+
+
+<select name="match_id" required>
+
+
+{% for match in matches %}
+
+
+<option value="{{match.id}}">
+
+
+{{match.team_name if match.team_name else ""}}
+
+vs
+
+{{match.opponent}}
+
+-
+
+{{match.date}}
+
+
+</option>
+
+
+{% endfor %}
+
+
+</select>
+
+
+
+
+
+<h3>Performance</h3>
+
+
+<label>
+Goals:
+</label>
+
+
+<input
+
+type="number"
+
+name="goals"
+
+value="0"
+
+min="0"
+
+>
+
+
+
+
+<label>
+Assists:
+</label>
+
+
+<input
+
+type="number"
+
+name="assists"
+
+value="0"
+
+min="0"
+
+>
+
+
+
+
+<label>
+Minutes:
+</label>
+
+
+<input
+
+type="number"
+
+name="minutes"
+
+value="0"
+
+min="0"
+
+>
+
+
+
+
+<br><br>
+
+
+
+<button type="submit">
+
+Save Performance
+
+</button>
+
+
+
 
 </form>
 
+
+
+<hr>
+
+
+<a href="/">
+
+Back to Dashboard
+
+</a>
+
+
+
 </body>
+
+
 </html>
