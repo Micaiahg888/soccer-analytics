@@ -13,42 +13,28 @@ def home():
 
     conn = get_db()
 
-
-
     players = conn.execute("""
 
     SELECT
 
     players.id,
-
     players.name,
-
+    players.position,
+    players.number,
     teams.name AS team_name,
 
-
-    COALESCE(SUM(player_stats.goals),0)
-    AS goals,
-
-
-    COALESCE(SUM(player_stats.assists),0)
-    AS assists
-
+    COALESCE(SUM(player_stats.goals), 0) AS goals,
+    COALESCE(SUM(player_stats.assists), 0) AS assists
 
     FROM players
 
-
     JOIN teams
-
     ON players.team_id = teams.id
 
-
     LEFT JOIN player_stats
-
     ON players.id = player_stats.player_id
 
-
     GROUP BY players.id
-
 
     """).fetchall()
 
@@ -137,9 +123,11 @@ def add_player():
 
     """
 
-    INSERT INTO players(team_id,name)
+    INSERT INTO players
 
-    VALUES(?,?)
+    (team_id,name,position,number)
+
+    VALUES(?,?,?,?)
 
     """,
 
@@ -147,7 +135,11 @@ def add_player():
 
     request.form["team_id"],
 
-    request.form["name"]
+    request.form["name"],
+
+    request.form["position"],
+
+    request.form["number"]
 
     )
 
@@ -160,9 +152,6 @@ def add_player():
 
 
     return redirect("/")
-
-
-
 
 
 @app.route("/add_match", methods=["POST"])
@@ -236,51 +225,92 @@ def add_match():
 @app.route("/team/<int:team_id>")
 def team_page(team_id):
 
-    conn=get_db()
+    conn = get_db()
 
-
-    team=conn.execute(
-
-    "SELECT * FROM teams WHERE id=?",
-
-    (team_id,)
-
+    team = conn.execute(
+        "SELECT * FROM teams WHERE id=?",
+        (team_id,)
     ).fetchone()
 
+    players = conn.execute(
+        """
+        SELECT
 
+        players.id,
+        players.name,
+        players.position,
+        players.number,
 
-    players=conn.execute(
+        COALESCE(SUM(player_stats.goals), 0) AS goals,
+        COALESCE(SUM(player_stats.assists), 0) AS assists,
+        COALESCE(SUM(player_stats.minutes), 0) AS minutes
 
-    """
+        FROM players
 
-    SELECT *
+        LEFT JOIN player_stats
+        ON players.id = player_stats.player_id
 
-    FROM players
+        WHERE players.team_id = ?
 
-    WHERE team_id=?
+        GROUP BY players.id
 
-    """,
-
-    (team_id,)
-
+        """,
+        (team_id,)
     ).fetchall()
 
+    matches = conn.execute(
+        """
+        SELECT *
+        FROM matches
+        WHERE team_id=?
+        """,
+        (team_id,)
+    ).fetchall()
+
+    # ---------------------------
+    # SAFE ADDITION: TEAM STATS
+    # ---------------------------
+
+    wins = 0
+    losses = 0
+    draws = 0
+    goals = 0
+
+    for m in matches:
+        # safe access (prevents crashes if NULL)
+        team_score = m["team_score"] or 0
+        opponent_score = m["opponent_score"] or 0
+
+        goals += team_score
+
+        if team_score > opponent_score:
+            wins += 1
+        elif team_score < opponent_score:
+            losses += 1
+        else:
+            draws += 1
+
+    total_games = len(matches)
+
+    win_percentage = (
+        (wins / total_games) * 100
+        if total_games > 0
+        else 0
+    )
 
     conn.close()
 
-
-
     return render_template(
-
-    "team.html",
-
-    team=team,
-
-    players=players
-
+        "team.html",
+        team=team,
+        players=players,
+        matches=matches,
+        wins=wins,
+        losses=losses,
+        draws=draws,
+        goals=goals,
+        win_percentage=win_percentage
     )
-
-
 
 
 
@@ -670,7 +700,26 @@ def edit_stat(stat_id):
 
 
 
+@app.route("/delete_player/<int:player_id>")
+def delete_player(player_id):
 
+    conn = get_db()
+
+    # delete stats first (important for database integrity)
+    conn.execute(
+        "DELETE FROM player_stats WHERE player_id=?",
+        (player_id,)
+    )
+
+    conn.execute(
+        "DELETE FROM players WHERE id=?",
+        (player_id,)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/")
 
 @app.route("/delete_stat/<int:stat_id>")
 def delete_stat(stat_id):

@@ -26,8 +26,6 @@ def create_tables():
     )
     """)
 
-
-
     conn.execute("""
     CREATE TABLE IF NOT EXISTS players(
 
@@ -36,6 +34,10 @@ def create_tables():
         team_id INTEGER,
 
         name TEXT NOT NULL,
+        
+        position TEXT NOT NULL,
+        
+        number INTEGER NOT NULL,
 
         FOREIGN KEY(team_id)
         REFERENCES teams(id)

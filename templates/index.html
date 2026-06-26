@@ -107,6 +107,32 @@ required
 
 >
 
+<select name="position">
+
+
+<option>GK</option>
+
+<option>DEF</option>
+
+<option>MID</option>
+
+<option>FW</option>
+
+
+</select>
+
+
+
+<input
+
+type="number"
+
+name="number"
+
+placeholder="Jersey Number"
+
+>
+
 
 <select name="team_id">
 
@@ -156,13 +182,17 @@ Add Player
 
 <th>Name</th>
 
+<th>Position</th>
+
+<th>Number</th>
+
 <th>Team</th>
 
 <th>Goals</th>
 
 <th>Assists</th>
 
-<th>Page</th>
+<th>Actions</th>
 
 </tr>
 
@@ -181,6 +211,18 @@ Add Player
 
 </td>
 
+<td>
+
+{{player.position}}
+
+</td>
+
+
+<td>
+
+{{player.number}}
+
+</td>
 
 <td>
 
@@ -202,20 +244,14 @@ Add Player
 
 </td>
 
-
 <td>
-
-
-<a href="/player/{{player.id}}">
-
-View
-
+<a href="/player/{{player.id}}">View</a>
+|
+<a href="/delete_player/{{player.id}}"
+   onclick="return confirm('Delete this player?')">
+Delete
 </a>
-
-
 </td>
-
-
 
 </tr>
 
