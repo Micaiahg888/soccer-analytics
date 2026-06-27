@@ -4,6 +4,10 @@
 <form method="POST">
 
 
+<label>
+Name:
+</label>
+
 <input
 
 name="name"
@@ -11,6 +15,64 @@ name="name"
 value="{{player.name}}"
 
 >
+
+
+<br><br>
+
+
+<label>
+Position:
+</label>
+
+
+<select name="position">
+
+
+<option value="GK"
+{% if player.position == "GK" %}
+selected
+{% endif %}
+>
+GK
+</option>
+
+
+<option value="DEF"
+{% if player.position == "DEF" %}
+selected
+{% endif %}
+>
+DEF
+</option>
+
+
+<option value="MID"
+{% if player.position == "MID" %}
+selected
+{% endif %}
+>
+MID
+</option>
+
+
+<option value="FW"
+{% if player.position == "FW" %}
+selected
+{% endif %}
+>
+FW
+</option>
+
+
+</select>
+
+
+<br><br>
+
+
+<label>
+Team:
+</label>
 
 
 <select name="team_id">
@@ -37,6 +99,9 @@ selected
 
 
 </select>
+
+
+<br><br>
 
 
 <button>

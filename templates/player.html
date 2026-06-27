@@ -98,6 +98,115 @@ Edit Player
 
 <br>
 
+<hr>
+
+
+<h2>Player Analytics</h2>
+
+
+<table border="1">
+
+
+<tr>
+
+<th>Games</th>
+
+<th>Goals/Game</th>
+
+<th>Assists/Game</th>
+
+<th>Goals/90</th>
+
+<th>Assists/90</th>
+
+</tr>
+
+
+
+<tr>
+
+
+<td>
+
+{{analytics.games}}
+
+</td>
+
+
+
+<td>
+
+{% if analytics.games > 0 %}
+
+{{ "%.2f"|format(analytics.goals / analytics.games) }}
+
+{% else %}
+
+0
+
+{% endif %}
+
+</td>
+
+
+
+
+<td>
+
+{% if analytics.games > 0 %}
+
+{{ "%.2f"|format(analytics.assists / analytics.games) }}
+
+{% else %}
+
+0
+
+{% endif %}
+
+</td>
+
+
+
+
+
+<td>
+
+{% if analytics.minutes > 0 %}
+
+{{ "%.2f"|format((analytics.goals / analytics.minutes) * 90) }}
+
+{% else %}
+
+0
+
+{% endif %}
+
+</td>
+
+
+
+
+
+<td>
+
+{% if analytics.minutes > 0 %}
+
+{{ "%.2f"|format((analytics.assists / analytics.minutes) * 90) }}
+
+{% else %}
+
+0
+
+{% endif %}
+
+</td>
+
+
+
+</tr>
+
+
+</table>
 
 <a href="/add_stat">
 

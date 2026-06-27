@@ -428,22 +428,39 @@ def player_page(player_id):
 
     ).fetchone()
 
-
+    analytics = conn.execute(
+        """
+        SELECT
+    
+        COUNT(player_stats.id) AS games,
+    
+        COALESCE(SUM(player_stats.goals),0)
+        AS goals,
+    
+        COALESCE(SUM(player_stats.assists),0)
+        AS assists,
+    
+        COALESCE(SUM(player_stats.minutes),0)
+        AS minutes
+    
+    
+        FROM player_stats
+    
+    
+        WHERE player_stats.player_id = ?
+    
+        """,
+        (player_id,)
+    ).fetchone()
 
     conn.close()
 
-
-
     return render_template(
-
-    "player.html",
-
-    player=player,
-
-    stats=stats,
-
-    totals=totals
-
+        "player.html",
+        player=player,
+        stats=stats,
+        totals=totals,
+        analytics=analytics
     )
 
 
@@ -549,11 +566,10 @@ def add_stat():
 @app.route("/edit/<int:player_id>", methods=["GET","POST"])
 def edit_player(player_id):
 
-    conn=get_db()
+    conn = get_db()
 
 
-    if request.method=="POST":
-
+    if request.method == "POST":
 
         conn.execute(
 
@@ -561,18 +577,17 @@ def edit_player(player_id):
 
         UPDATE players
 
-
-        SET name=?, team_id=?
-
+        SET name=?, position=?, team_id=?
 
         WHERE id=?
-
 
         """,
 
         (
 
         request.form["name"],
+
+        request.form["position"],
 
         request.form["team_id"],
 
@@ -589,7 +604,6 @@ def edit_player(player_id):
 
 
         return redirect(f"/player/{player_id}")
-
 
 
     player=conn.execute(
