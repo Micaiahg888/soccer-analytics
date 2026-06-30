@@ -108,6 +108,48 @@ Win Percentage:
 
 <hr>
 
+<hr>
+
+<h2>Team Leaders</h2>
+
+
+{% if top_scorer %}
+
+<p>
+
+Top Scorer:
+
+{{top_scorer.name}}
+
+-
+
+{{top_scorer.goals}}
+
+Goals
+
+</p>
+
+{% endif %}
+
+
+
+{% if top_assister %}
+
+<p>
+
+Top Assister:
+
+{{top_assister.name}}
+
+-
+
+{{top_assister.assists}}
+
+Assists
+
+</p>
+
+{% endif %}
 
 
 <h2>Matches</h2>

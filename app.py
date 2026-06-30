@@ -298,6 +298,70 @@ def team_page(team_id):
         else 0
     )
 
+    top_scorer = conn.execute(
+        """
+        SELECT
+
+        players.name,
+
+        SUM(player_stats.goals) AS goals
+
+
+        FROM players
+
+
+        JOIN player_stats
+
+        ON players.id = player_stats.player_id
+
+
+        WHERE players.team_id = ?
+
+
+        GROUP BY players.id
+
+
+        ORDER BY goals DESC
+
+
+        LIMIT 1
+
+        """,
+        (team_id,)
+    ).fetchone()
+
+    top_assister = conn.execute(
+        """
+        SELECT
+
+        players.name,
+
+        SUM(player_stats.assists) AS assists
+
+
+        FROM players
+
+
+        JOIN player_stats
+
+        ON players.id = player_stats.player_id
+
+
+        WHERE players.team_id = ?
+
+
+        GROUP BY players.id
+
+
+        ORDER BY assists DESC
+
+
+        LIMIT 1
+
+        """,
+        (team_id,)
+    ).fetchone()
+
     conn.close()
 
     return render_template(
@@ -309,7 +373,9 @@ def team_page(team_id):
         losses=losses,
         draws=draws,
         goals=goals,
-        win_percentage=win_percentage
+        win_percentage=win_percentage,
+        top_scorer=top_scorer,
+        top_assister=top_assister
     )
 
 
