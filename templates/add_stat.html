@@ -25,6 +25,17 @@
 
 
 <select name="player_id" required>
+    <option value="" disabled {% if not selected_player %}selected{% endif %}>
+        Select Player
+    </option>
+
+    {% for player in players %}
+        <option value="{{ player.id }}"
+            {% if selected_player == player.id %}selected{% endif %}>
+            {{ player.name }}
+        </option>
+    {% endfor %}
+</select>
 
 
 {% for player in players %}

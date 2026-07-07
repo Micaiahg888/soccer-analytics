@@ -1,21 +1,68 @@
+
 <!DOCTYPE html>
 
 <html>
 
 <head>
-
-<title>Soccer Analytics</title>
-
+    <title>Soccer Analytics Dashboard</title>
 </head>
 
 
 <body>
 
 
-<h1>Soccer Analytics Dashboard</h1>
+<h1>⚽ Soccer Analytics Dashboard</h1>
+
+
+<nav>
+
+<a href="/">Dashboard</a> |
+
+<a href="/compare">Compare Players</a> |
+
+<a href="/analytics">Analytics</a>
+
+</nav>
 
 
 <hr>
+
+
+
+<h2>Teams</h2>
+
+
+<table border="1">
+
+<tr>
+    <th>Name</th>
+</tr>
+
+
+{% for team in teams %}
+
+<tr>
+
+<td>
+
+<a href="/team/{{team.id}}">
+{{team.name}}
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+
+</table>
+
+
+
+
+<hr>
+
 
 
 <h2>Add Team</h2>
@@ -23,11 +70,17 @@
 
 <form method="POST" action="/add_team">
 
+
 <input
+
 type="text"
+
 name="name"
+
 placeholder="Team name"
+
 required
+
 >
 
 
@@ -40,11 +93,15 @@ Add Team
 
 
 
+
+
 <hr>
 
 
 
-<h2>Teams</h2>
+
+
+<h2>Players</h2>
 
 
 <table border="1">
@@ -54,31 +111,91 @@ Add Team
 
 <th>Name</th>
 
+<th>Position</th>
+
+<th>Number</th>
+
+<th>Team</th>
+
+<th>Goals</th>
+
+<th>Assists</th>
+
+<th>Actions</th>
+
 </tr>
 
 
 
-{% for team in teams %}
+{% for player in players %}
 
 
 <tr>
 
+
 <td>
 
-<a href="/team/{{team.id}}">
+<a href="/player/{{player.id}}">
+{{player.name}}
+</a>
 
-{{team.name}}
+</td>
+
+
+<td>
+{{player.position}}
+</td>
+
+
+<td>
+{{player.number}}
+</td>
+
+
+<td>
+{{player.team_name}}
+</td>
+
+
+<td>
+{{player.goals}}
+</td>
+
+
+<td>
+{{player.assists}}
+</td>
+
+
+<td>
+
+<a href="/player/{{player.id}}">
+View
+</a>
+
+|
+
+<a href="/edit/{{player.id}}">
+Edit
+</a>
+
+|
+
+<a href="/delete_player/{{player.id}}"
+onclick="return confirm('Delete this player?')">
+
+Delete
 
 </a>
 
 
 </td>
 
+
 </tr>
 
 
 {% endfor %}
-
 
 
 </table>
@@ -88,6 +205,7 @@ Add Team
 
 
 <hr>
+
 
 
 
@@ -107,8 +225,8 @@ required
 
 >
 
-<select name="position">
 
+<select name="position">
 
 <option>GK</option>
 
@@ -117,7 +235,6 @@ required
 <option>MID</option>
 
 <option>FW</option>
-
 
 </select>
 
@@ -167,12 +284,15 @@ Add Player
 
 
 
+
 <hr>
 
 
 
 
-<h2>Players</h2>
+
+<h2>Matches</h2>
+
 
 
 <table border="1">
@@ -180,84 +300,80 @@ Add Player
 
 <tr>
 
-<th>Name</th>
-
-<th>Position</th>
-
-<th>Number</th>
-
 <th>Team</th>
 
-<th>Goals</th>
+<th>Opponent</th>
 
-<th>Assists</th>
+<th>Date</th>
 
-<th>Actions</th>
+<th>Season</th>
+
+<th>Location</th>
+
+<th>Score</th>
 
 </tr>
 
 
 
-{% for player in players %}
 
+{% for match in matches %}
 
 
 <tr>
 
 
 <td>
-
-{{player.name}}
-
+{{match.team_name}}
 </td>
 
-<td>
-
-{{player.position}}
-
-</td>
 
 
 <td>
 
-{{player.number}}
+<a href="/match/{{match.id}}">
 
-</td>
+{{match.opponent}}
 
-<td>
-
-{{player.team_name}}
-
-</td>
-
-
-<td>
-
-{{player.goals}}
-
-</td>
-
-
-<td>
-
-{{player.assists}}
-
-</td>
-
-<td>
-<a href="/player/{{player.id}}">View</a>
-|
-<a href="/delete_player/{{player.id}}"
-   onclick="return confirm('Delete this player?')">
-Delete
 </a>
+
 </td>
+
+
+
+<td>
+{{match.date}}
+</td>
+
+
+
+<td>
+{{match.season}}
+</td>
+
+
+
+<td>
+{{match.location}}
+</td>
+
+
+
+<td>
+
+{{match.team_score}}
+
+-
+
+{{match.opponent_score}}
+
+</td>
+
 
 </tr>
 
 
 {% endfor %}
-
 
 
 </table>
@@ -271,11 +387,13 @@ Delete
 
 
 
+
 <h2>Add Match</h2>
 
 
 
 <form method="POST" action="/add_match">
+
 
 
 <select name="team_id">
@@ -298,7 +416,6 @@ Delete
 
 
 
-
 <input
 
 name="opponent"
@@ -308,6 +425,7 @@ placeholder="Opponent"
 required
 
 >
+
 
 
 
@@ -323,7 +441,6 @@ required
 
 
 
-
 <input
 
 name="season"
@@ -334,23 +451,17 @@ placeholder="Season"
 
 
 
-
 <select name="location">
-
 
 <option>
 Home
 </option>
 
-
 <option>
 Away
 </option>
 
-
 </select>
-
-
 
 
 
@@ -363,7 +474,6 @@ name="team_score"
 placeholder="Your Score"
 
 >
-
 
 
 
@@ -392,98 +502,7 @@ Add Match
 
 
 
-
-<hr>
-
-
-
-<h2>Matches</h2>
-
-
-<table border="1">
-
-
-<tr>
-
-<th>Team</th>
-
-<th>Opponent</th>
-
-<th>Date</th>
-
-<th>Season</th>
-
-<th>Location</th>
-
-<th>Score</th>
-
-</tr>
-
-
-
-{% for match in matches %}
-
-
-
-<tr>
-
-
-<td>
-
-{{match.team_name}}
-
-</td>
-
-
-<td>
-
-{{match.opponent}}
-
-</td>
-
-
-<td>
-
-{{match.date}}
-
-</td>
-
-
-<td>
-
-{{match.season}}
-
-</td>
-
-
-<td>
-
-{{match.location}}
-
-</td>
-
-
-<td>
-
-{{match.team_score}}
-
--
-
-{{match.opponent_score}}
-
-</td>
-
-
-</tr>
-
-
-{% endfor %}
-
-
-</table>
-
-
 </body>
 
-
 </html>
+```

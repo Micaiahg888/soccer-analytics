@@ -6,7 +6,36 @@ from database import get_db
 app = Flask(__name__)
 
 
+def get_player_analytics(conn, player_id):
 
+    analytics = conn.execute(
+        """
+        SELECT
+            COUNT(id) AS games,
+            COALESCE(SUM(goals), 0) AS goals,
+            COALESCE(SUM(assists), 0) AS assists,
+            COALESCE(SUM(minutes), 0) AS minutes
+        FROM player_stats
+        WHERE player_id = ?
+        """,
+        (player_id,)
+    ).fetchone()
+
+    games = analytics["games"] or 0
+    goals = analytics["goals"] or 0
+    assists = analytics["assists"] or 0
+    minutes = analytics["minutes"] or 0
+
+    return {
+        "games": games,
+        "goals": goals,
+        "assists": assists,
+        "minutes": minutes,
+        "goals_per_game": goals / games if games else 0,
+        "assists_per_game": assists / games if games else 0,
+        "goals_per_90": (goals / minutes) * 90 if minutes else 0,
+        "assists_per_90": (assists / minutes) * 90 if minutes else 0
+    }
 
 @app.route("/")
 def home():
@@ -384,142 +413,56 @@ def team_page(team_id):
 @app.route("/player/<int:player_id>")
 def player_page(player_id):
 
-    conn=get_db()
+    conn = get_db()
 
-
-
-    player=conn.execute(
-
-    """
-
-    SELECT
-
-    players.*,
-
-    teams.name AS team_name
-
-
-    FROM players
-
-
-    JOIN teams
-
-    ON players.team_id=teams.id
-
-
-    WHERE players.id=?
-
-
-    """,
-
-    (player_id,)
-
-    ).fetchone()
-
-
-
-
-    stats=conn.execute(
-
-    """
-
-    SELECT
-
-
-    player_stats.*,
-
-
-    matches.opponent,
-
-    matches.date,
-
-    matches.season,
-
-    matches.location
-
-
-
-    FROM player_stats
-
-
-
-    JOIN matches
-
-
-    ON player_stats.match_id=matches.id
-
-
-
-    WHERE player_stats.player_id=?
-
-
-    """,
-
-    (player_id,)
-
-    ).fetchall()
-
-
-
-
-    totals=conn.execute(
-
-    """
-
-    SELECT
-
-
-    COUNT(*) AS games,
-
-
-    SUM(goals) AS goals,
-
-
-    SUM(assists) AS assists,
-
-
-    SUM(minutes) AS minutes
-
-
-
-    FROM player_stats
-
-
-    WHERE player_id=?
-
-
-    """,
-
-    (player_id,)
-
-    ).fetchone()
-
-    analytics = conn.execute(
-        """
+    player = conn.execute("""
         SELECT
-    
-        COUNT(player_stats.id) AS games,
-    
-        COALESCE(SUM(player_stats.goals),0)
-        AS goals,
-    
-        COALESCE(SUM(player_stats.assists),0)
-        AS assists,
-    
-        COALESCE(SUM(player_stats.minutes),0)
-        AS minutes
-    
-    
+            players.*,
+            teams.name AS team_name
+        FROM players
+        JOIN teams ON players.team_id = teams.id
+        WHERE players.id = ?
+    """, (player_id,)).fetchone()
+
+    stats = conn.execute("""
+        SELECT
+            player_stats.*,
+            matches.opponent,
+            matches.date,
+            matches.season,
+            matches.location
         FROM player_stats
-    
-    
+        JOIN matches ON player_stats.match_id = matches.id
         WHERE player_stats.player_id = ?
-    
-        """,
-        (player_id,)
-    ).fetchone()
+    """, (player_id,)).fetchall()
+
+    totals = conn.execute("""
+        SELECT
+            COUNT(*) AS games,
+            COALESCE(SUM(goals), 0) AS goals,
+            COALESCE(SUM(assists), 0) AS assists,
+            COALESCE(SUM(minutes), 0) AS minutes
+        FROM player_stats
+        WHERE player_id = ?
+    """, (player_id,)).fetchone()
+
+    analytics = get_player_analytics(conn, player_id)
 
     conn.close()
+
+    # -----------------------------
+    # DATA ANALYSIS LAYER (NEW)
+    # -----------------------------
+    games = analytics["games"] or 0
+    goals = analytics["goals"] or 0
+    assists = analytics["assists"] or 0
+    minutes = analytics["minutes"] or 0
+
+    goals_per_game = goals / games if games > 0 else 0
+    assists_per_game = assists / games if games > 0 else 0
+
+    goals_per_90 = (goals / minutes) * 90 if minutes > 0 else 0
+    assists_per_90 = (assists / minutes) * 90 if minutes > 0 else 0
 
     return render_template(
         "player.html",
@@ -530,19 +473,15 @@ def player_page(player_id):
     )
 
 
-
-
-
-
 @app.route("/add_stat", methods=["GET","POST"])
 def add_stat():
 
     conn=get_db()
 
-
+    selected_player = request.args.get("player_id")
 
     if request.method=="POST":
-
+        print(request.form)
 
         conn.execute(
 
@@ -611,16 +550,11 @@ def add_stat():
 
     conn.close()
 
-
-
     return render_template(
-
-    "add_stat.html",
-
-    players=players,
-
-    matches=matches
-
+        "add_stat.html",
+        players=players,
+        matches=matches,
+        selected_player=int(selected_player) if selected_player else None
     )
 
 
@@ -824,9 +758,99 @@ def delete_stat(stat_id):
     return redirect("/")
 
 
+@app.route("/match/<int:match_id>")
+def match_detail(match_id):
+
+    conn = get_db()
+
+    match = conn.execute(
+        """
+        SELECT matches.*, teams.name AS team_name
+        FROM matches
+        JOIN teams ON matches.team_id = teams.id
+        WHERE matches.id = ?
+        """,
+        (match_id,)
+    ).fetchone()
+
+    stats = conn.execute(
+        """
+        SELECT
+            players.name,
+            player_stats.goals,
+            player_stats.assists,
+            player_stats.minutes
+        FROM player_stats
+        JOIN players ON player_stats.player_id = players.id
+        WHERE player_stats.match_id = ?
+        """,
+        (match_id,)
+    ).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "match.html",
+        match=match,
+        stats=stats
+    )
+
+@app.route("/analytics")
+def analytics():
+
+    conn = get_db()
+
+    conn.close()
+
+    return render_template("analytics.html")
 
 
+@app.route("/compare", methods=["GET", "POST"])
+def compare_players():
 
+    conn = get_db()
+
+    players = conn.execute("""
+        SELECT id, name
+        FROM players
+        ORDER BY name
+    """).fetchall()
+
+    if request.method == "POST":
+
+        player1_id = int(request.form["player1"])
+        player2_id = int(request.form["player2"])
+
+        player1 = conn.execute(
+            "SELECT * FROM players WHERE id=?",
+            (player1_id,)
+        ).fetchone()
+
+        player2 = conn.execute(
+            "SELECT * FROM players WHERE id=?",
+            (player2_id,)
+        ).fetchone()
+
+        analytics1 = get_player_analytics(conn, player1_id)
+        analytics2 = get_player_analytics(conn, player2_id)
+
+        conn.close()
+
+        return render_template(
+            "compare.html",
+            players=players,
+            player1=player1,
+            player2=player2,
+            analytics1=analytics1,
+            analytics2=analytics2
+        )
+
+    conn.close()
+
+    return render_template(
+        "compare.html",
+        players=players
+    )
 
 if __name__=="__main__":
 

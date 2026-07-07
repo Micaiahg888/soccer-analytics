@@ -1,336 +1,97 @@
 <!DOCTYPE html>
-
 <html>
-
 <body>
 
+<h1>{{ player.name }}</h1>
 
-<h1>
+<h3>Team: {{ player.team_name }}</h3>
+<h3>Position: {{ player.position }}</h3>
+<h3>Number: {{ player.number }}</h3>
 
-{{player.name}}
-
-</h1>
-
-
-<h3>
-
-Team: {{player.team_name}}
-
-</h3>
-
-<h3>
-
-Position:
-
-{{player.position}}
-
-</h3>
-
-
-<h3>
-
-Number:
-
-{{player.number}}
-
-</h3>
-
-<a href="/edit/{{player.id}}">
-
-Edit Player
-
-</a>
-
+<a href="/edit/{{ player.id }}">Edit Player</a>
 
 <hr>
-
-
 
 <h2>Career Stats</h2>
 
-
 <table border="1">
-
-
 <tr>
-
-<th>Games</th>
-
-<th>Goals</th>
-
-<th>Assists</th>
-
-<th>Minutes</th>
-
+    <th>Games</th>
+    <th>Goals</th>
+    <th>Assists</th>
+    <th>Minutes</th>
 </tr>
 
-
 <tr>
-
-
-<td>
-{{totals.games}}
-</td>
-
-
-<td>
-{{totals.goals or 0}}
-</td>
-
-
-<td>
-{{totals.assists or 0}}
-</td>
-
-
-<td>
-{{totals.minutes or 0}}
-</td>
-
-
+    <td>{{ totals.games }}</td>
+    <td>{{ totals.goals or 0 }}</td>
+    <td>{{ totals.assists or 0 }}</td>
+    <td>{{ totals.minutes or 0 }}</td>
 </tr>
-
-
 </table>
 
-
-
-
-<br>
-
 <hr>
-
 
 <h2>Player Analytics</h2>
 
-
 <table border="1">
-
-
 <tr>
-
-<th>Games</th>
-
-<th>Goals/Game</th>
-
-<th>Assists/Game</th>
-
-<th>Goals/90</th>
-
-<th>Assists/90</th>
-
+    <th>Games</th>
+    <th>Goals/Game</th>
+    <th>Assists/Game</th>
+    <th>Goals/90</th>
+    <th>Assists/90</th>
 </tr>
 
-
-
 <tr>
-
-
-<td>
-
-{{analytics.games}}
-
-</td>
-
-
-
-<td>
-
-{% if analytics.games > 0 %}
-
-{{ "%.2f"|format(analytics.goals / analytics.games) }}
-
-{% else %}
-
-0
-
-{% endif %}
-
-</td>
-
-
-
-
-<td>
-
-{% if analytics.games > 0 %}
-
-{{ "%.2f"|format(analytics.assists / analytics.games) }}
-
-{% else %}
-
-0
-
-{% endif %}
-
-</td>
-
-
-
-
-
-<td>
-
-{% if analytics.minutes > 0 %}
-
-{{ "%.2f"|format((analytics.goals / analytics.minutes) * 90) }}
-
-{% else %}
-
-0
-
-{% endif %}
-
-</td>
-
-
-
-
-
-<td>
-
-{% if analytics.minutes > 0 %}
-
-{{ "%.2f"|format((analytics.assists / analytics.minutes) * 90) }}
-
-{% else %}
-
-0
-
-{% endif %}
-
-</td>
-
-
-
+    <td>{{ analytics.games }}</td>
+    <td>{{ "%.2f"|format(analytics.goals_per_game) }}</td>
+    <td>{{ "%.2f"|format(analytics.assists_per_game) }}</td>
+    <td>{{ "%.2f"|format(analytics.goals_per_90) }}</td>
+    <td>{{ "%.2f"|format(analytics.assists_per_90) }}</td>
 </tr>
-
-
 </table>
 
-<a href="/add_stat">
-
-Add Performance
-
+<a href="/add_stat?player_id={{ player.id }}">
+    Add Performance
 </a>
-
-
 
 <hr>
 
-
-
 <h2>Performance</h2>
 
-
 <table border="1">
-
-
 <tr>
-
-<th>Opponent</th>
-
-<th>Date</th>
-
-<th>Season</th>
-
-<th>Location</th>
-
-<th>Goals</th>
-
-<th>Assists</th>
-
-<th>Minutes</th>
-
-<th>Actions</th>
-
-
+    <th>Opponent</th>
+    <th>Date</th>
+    <th>Season</th>
+    <th>Location</th>
+    <th>Goals</th>
+    <th>Assists</th>
+    <th>Minutes</th>
+    <th>Actions</th>
 </tr>
-
-
-
 
 {% for stat in stats %}
-
-
-
 <tr>
-
-
-<td>
-{{stat.opponent}}
-</td>
-
-
-<td>
-{{stat.date}}
-</td>
-
-
-<td>
-{{stat.season}}
-</td>
-
-
-<td>
-{{stat.location}}
-</td>
-
-
-<td>
-{{stat.goals}}
-</td>
-
-
-<td>
-{{stat.assists}}
-</td>
-
-
-<td>
-{{stat.minutes}}
-</td>
-
-
-<td>
-
-
-<a href="/edit_stat/{{stat.id}}">
-Edit
-</a>
-
-
-|
-
-<a href="/delete_stat/{{stat.id}}">
-Delete
-</a>
-
-
-</td>
-
-
+    <td>{{ stat.opponent }}</td>
+    <td>{{ stat.date }}</td>
+    <td>{{ stat.season }}</td>
+    <td>{{ stat.location }}</td>
+    <td>{{ stat.goals }}</td>
+    <td>{{ stat.assists }}</td>
+    <td>{{ stat.minutes }}</td>
+    <td>
+        <a href="/edit_stat/{{ stat.id }}">Edit</a> |
+        <a href="/delete_stat/{{ stat.id }}">Delete</a>
+    </td>
 </tr>
-
-
-
 {% endfor %}
-
-
 </table>
-
 
 <br>
 
-
-<a href="/">
-
-Back
-
-</a>
-
-
+<a href="/">Back</a>
 
 </body>
-
 </html>

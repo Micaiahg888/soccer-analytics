@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>
+{{ match.team_name }} vs {{ match.opponent }}
+</h1>
+
+<h3>
+Date: {{ match.date }}
+</h3>
+
+<h3>
+Score: {{ match.team_score }} - {{ match.opponent_score }}
+</h3>
+
+<hr>
+
+<h2>Player Performance</h2>
+
+<table border="1">
+
+<tr>
+<th>Player</th>
+<th>Goals</th>
+<th>Assists</th>
+<th>Minutes</th>
+</tr>
+
+{% for s in stats %}
+
+<tr>
+<td>{{ s.name }}</td>
+<td>{{ s.goals }}</td>
+<td>{{ s.assists }}</td>
+<td>{{ s.minutes }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<a href="/">Back</a>
+
+</body>
+</html>
