@@ -1,48 +1,46 @@
-<!DOCTYPE html>
-<html>
-<body>
-
-<h1>
-{{ match.team_name }} vs {{ match.opponent }}
-</h1>
-
-<h3>
-Date: {{ match.date }}
-</h3>
-
-<h3>
-Score: {{ match.team_score }} - {{ match.opponent_score }}
-</h3>
-
-<hr>
-
-<h2>Player Performance</h2>
-
-<table border="1">
-
-<tr>
-<th>Player</th>
-<th>Goals</th>
-<th>Assists</th>
-<th>Minutes</th>
-</tr>
-
-{% for s in stats %}
-
-<tr>
-<td>{{ s.name }}</td>
-<td>{{ s.goals }}</td>
-<td>{{ s.assists }}</td>
-<td>{{ s.minutes }}</td>
-</tr>
-
-{% endfor %}
-
-</table>
-
-<br>
-
-<a href="/">Back</a>
-
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}{{ fixture.home_name }} vs {{ fixture.away_name }}{% endblock %}
+{% block body %}
+<a class="back" href="{{ url_for('league.feed') }}">← League</a>
+<section class="panel match-banner">
+  <span class="status {{ 'final' if fixture.is_final else 'upcoming' }}">{{ 'Final' if fixture.is_final else 'Upcoming' }}</span>
+  <h1>{{ fixture.home_name }} <span>vs</span> {{ fixture.away_name }}</h1>
+  {% if fixture.is_final %}
+    <p class="big-score" aria-label="Final score">{{ fixture.team_score }} <span>–</span> {{ fixture.opponent_score }}</p>
+  {% endif %}
+  <p class="muted">{{ fixture.date or 'Date TBD' }}{% if fixture.location %} · {{ fixture.location }}{% endif %}{% if fixture.season %} · {{ fixture.season }}{% endif %}</p>
+</section>
+{% if recap or can_edit %}
+<section class="content-section">
+  <div class="section-heading">
+    <div>
+      <h2>{{ g.member.team_name }} recap</h2>
+      {% if recap %}<span class="status">{{ 'Published' if recap.record.published_at else 'Draft' }}</span>{% endif %}
+    </div>
+    {% if can_edit %}<a class="button" href="{{ url_for('team_space.recap', match_id=fixture.id) }}">Enter stats</a>{% endif %}
+  </div>
+  {% if recap %}
+    {% if recap.record.team_note %}
+      <article class="panel"><h3>Team note</h3><p class="plain-text">{{ recap.record.team_note }}</p></article>
+    {% endif %}
+    {% if recap.entries %}
+      <div class="table-wrap panel content-section" role="region" tabindex="0" aria-label="Player statistics">
+        <table>
+          <caption>Player statistics</caption>
+          <thead><tr><th scope="col">Player</th><th scope="col">Minutes</th><th scope="col">Goals</th><th scope="col">Assists</th></tr></thead>
+          <tbody>{% for entry in recap.entries %}{% if entry.minutes is not none or entry.goals is not none or entry.assists is not none %}
+            <tr><th scope="row">{{ entry.name }}</th><td>{{ entry.minutes if entry.minutes is not none else '–' }}</td><td>{{ entry.goals if entry.goals is not none else '–' }}</td><td>{{ entry.assists if entry.assists is not none else '–' }}</td></tr>
+          {% endif %}{% endfor %}</tbody>
+        </table>
+      </div>
+      {% for entry in recap.entries if entry.feedback %}
+        <article class="panel content-section">
+          <h3>Individual feedback for {{ entry.name }}</h3>
+          <p class="plain-text">{{ entry.feedback }}</p>
+        </article>
+      {% endfor %}
+    {% endif %}
+  {% else %}<p class="panel empty">No recap has been started.</p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% macro fixture_card(fixture) %}
+<article class="fixture-card">
+  <div class="fixture-meta">
+    <span class="status {{ 'final' if fixture.is_final else 'upcoming' }}">{{ 'Final' if fixture.is_final else 'Upcoming' }}</span>
+    <span>{{ fixture.date or 'Date TBD' }}{% if fixture.season %} <span aria-hidden="true">·</span> {{ fixture.season }}{% endif %}</span>
+  </div>
+  <div class="fixture-score" aria-label="{{ fixture.home_name }} versus {{ fixture.away_name }}">
+    <div class="score-row"><span>{{ fixture.home_name }}</span><strong>{{ fixture.team_score if fixture.is_final else '–' }}</strong></div>
+    <div class="score-row"><span>{{ fixture.away_name }}</span><strong>{{ fixture.opponent_score if fixture.is_final else '–' }}</strong></div>
+  </div>
+  <a class="text-link" href="{{ url_for('league.match', match_id=fixture.id) }}" aria-label="Match details for {{ fixture.home_name }} versus {{ fixture.away_name }}">Match details <span aria-hidden="true">→</span></a>
+</article>
+{% endmacro %}

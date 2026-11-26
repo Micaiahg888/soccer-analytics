@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Add match{% endblock %}
+{% block body %}
+<a class="back" href="{{ url_for('team_space.home') }}">← My Team</a>
+<div class="narrow">
+<h1>Add match</h1>
+<p class="muted">This fixture will appear in the public League feed.</p>
+{% if error %}<p class="notice error" role="alert">{{ error }}</p>{% endif %}
+<form class="panel stack content-section" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <p><strong>Home team:</strong> {{ g.member.team_name }}</p>
+  <fieldset class="stack">
+    <legend>Opponent</legend>
+    <p class="small muted">Choose a league team or enter an external opponent.</p>
+    <label>League opponent
+      <select name="opponent_team_id"><option value="">Select a team</option>{% for opponent in opponents %}
+        <option value="{{ opponent.id }}" {% if request.form.get('opponent_team_id') == opponent.id|string %}selected{% endif %}>{{ opponent.name }}</option>
+      {% endfor %}</select>
+    </label>
+    <label>External opponent <input name="external_opponent" maxlength="100" value="{{ request.form.get('external_opponent', '') }}"></label>
+  </fieldset>
+  <div class="form-grid">
+    <label>Match date <input type="date" name="date" required value="{{ request.form.get('date', '') }}"></label>
+    <label>Season <input name="season" required maxlength="40" value="{{ request.form.get('season', '') }}" placeholder="Fall 2026"></label>
+  </div>
+  <label>Venue <span class="small muted">(optional)</span> <input name="location" maxlength="120" value="{{ request.form.get('location', '') }}"></label>
+  <button class="button" type="submit">Add match</button>
+</form>
+</div>
+{% endblock %}
