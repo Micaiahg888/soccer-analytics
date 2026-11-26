@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit player' if player else 'Add player' }}{% endblock %}
+{% block body %}
+<a class="back" href="{{ url_for('team_space.home') }}">← My Team</a>
+<div class="narrow">
+<h1>{{ 'Edit player' if player else 'Add player' }}</h1>
+{% if error %}<p class="notice error" role="alert">{{ error }}</p>{% endif %}
+<form class="panel stack content-section" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Player name <input name="name" required maxlength="100" value="{{ request.form.get('name', player.name if player else '') }}"></label>
+  <div class="form-grid">
+    <label>Position <input name="position" required maxlength="40" value="{{ request.form.get('position', player.position if player else '') }}"></label>
+    <label>Jersey number <input type="number" name="number" required min="0" max="999" value="{{ request.form.get('number', player.number if player else '') }}"></label>
+  </div>
+  <button class="button" type="submit">Save player</button>
+</form>
+{% if player and not player.archived %}
+  <form class="panel content-section stack" method="post" action="{{ url_for('team_space.archive_player', player_id=player.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <p>Archiving removes the player from the active roster and revokes their team access. Historical stats are retained.</p>
+    <button class="button secondary" type="submit">Archive player</button>
+  </form>
+{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Enter match stats{% endblock %}
+{% block body %}
+<a class="back" href="{{ url_for('team_space.home') }}">← My Team</a>
+<div class="section-heading page-heading">
+  <div><h1>Enter match stats</h1><p class="muted">{{ fixture.home_name }} vs {{ fixture.away_name }} · {{ fixture.date or 'Date TBD' }}</p></div>
+  <a class="button secondary" href="{{ url_for('league.match', match_id=fixture.id) }}">Match details</a>
+</div>
+{% if can_score %}
+  <form class="panel stack content-section" method="post" action="{{ url_for('team_space.score', match_id=fixture.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <h2>Public score</h2>
+    <div class="form-grid score-inputs">
+      <label>{{ fixture.home_name }} score <input type="number" name="home_score" required min="0" max="99" value="{{ fixture.team_score if fixture.is_final else '' }}"></label>
+      <label>{{ fixture.away_name }} score <input type="number" name="away_score" required min="0" max="99" value="{{ fixture.opponent_score if fixture.is_final else '' }}"></label>
+    </div>
+    <button class="button secondary" type="submit">Save final score</button>
+  </form>
+{% endif %}
+<form class="stack content-section" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="revision" value="{{ request.form.get('revision', record.revision if record else 0) }}">
+  <div class="section-heading">
+    <h2>Team recap</h2><span class="status">{{ 'Published' if record and record.published_at else 'Private draft' }}</span>
+  </div>
+  {% if error %}<p class="notice error" role="alert">{{ error }}</p>{% endif %}
+  {% if rows %}
+  <div class="table-wrap panel" role="region" tabindex="0" aria-label="Roster statistics entry">
+    <table class="entry-table">
+      <caption>Player stats and individual feedback</caption>
+      <thead><tr><th scope="col">Player</th><th scope="col">Minutes</th><th scope="col">Goals</th><th scope="col">Assists</th><th scope="col">Individual feedback</th></tr></thead>
+      <tbody>
+      {% for player in rows %}
+        <tr><th scope="row">{{ player.name }} <span class="small muted">#{{ player.number }}</span></th>
+          {% for key, label, maximum in [('minutes', 'Minutes', 150), ('goals', 'Goals', 99), ('assists', 'Assists', 99)] %}
+            {% set input = key ~ '_' ~ player.id %}
+            <td><input type="number" min="0" max="{{ maximum }}" name="{{ input }}" aria-label="{{ label }} for {{ player.name }}" value="{{ request.form.get(input, player[key] if player[key] is not none else '') }}"></td>
+          {% endfor %}
+          {% set input = 'feedback_' ~ player.id %}
+          <td><textarea name="{{ input }}" rows="2" maxlength="2000" aria-label="Individual feedback for {{ player.name }}">{{ request.form.get(input, player.feedback or '') }}</textarea></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}<p class="panel empty">Add players to your roster to enter individual stats.</p>{% endif %}
+  <label class="panel">Team note
+    <span class="small muted">Visible to your team when you publish.</span>
+    <textarea name="team_note" rows="5" maxlength="4000">{{ request.form.get('team_note', record.team_note if record else '') }}</textarea>
+  </label>
+  <div class="actions">
+    {% if not record or not record.published_at %}<button class="button secondary" name="action" value="draft" type="submit">Save draft</button>{% endif %}
+    <button class="button" name="action" value="publish" type="submit">{{ 'Publish updates' if record and record.published_at else 'Publish recap' }}</button>
+  </div>
+</form>
+{% endblock %}

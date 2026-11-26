@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}League{% endblock %} · Soccer Analytics</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="{{ url_for('league.feed') }}">Soccer Analytics</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="{{ url_for('league.feed') }}"{% if request.blueprint == 'league' %} aria-current="page"{% endif %}>League</a>
+        {% if g.member %}
+          <a href="{{ url_for('team_space.home') }}"{% if request.blueprint == 'team_space' %} aria-current="page"{% endif %}>My Team</a>
+          <a href="{{ url_for('accounts.profile') }}"{% if request.endpoint == 'accounts.profile' %} aria-current="page"{% endif %}>Profile</a>
+          <form method="post" action="{{ url_for('accounts.logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="nav-button" type="submit">Sign out</button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('accounts.login') }}"{% if request.endpoint == 'accounts.login' %} aria-current="page"{% endif %}>Sign in</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="shell page" tabindex="-1">
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+      <p class="notice{% if category == 'error' %} error{% endif %}" role="status">{{ message }}</p>
+    {% endfor %}
+    {% block body %}{% endblock %}
+  </main>
+  <footer class="shell site-footer"><a href="{{ url_for('league.feed') }}">Soccer Analytics</a></footer>
+</body>
+</html>

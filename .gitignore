@@ -8,3 +8,6 @@ soccer.db
 
 # PyCharm / IDE files
 .idea/
+.venv/
+instance/
+.pytest_cache/
