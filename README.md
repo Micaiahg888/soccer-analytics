@@ -15,9 +15,3 @@
 4. When PowerShell shows **Running on http://127.0.0.1:5000**, open the [Soccer Analytics dashboard](http://127.0.0.1:5000/) in your browser. Leave PowerShell open while you use the app.
 
 The first run creates an empty SQLite database. Use **Add Team** to get started. For later sessions, run just the last PowerShell command from this same folder.
-
-## Optional browser workspace
-
-On the [GitHub repository page](https://github.com/Micaiahg888/soccer-analytics), choose **Code → Codespaces → Create codespace on main** if that option is available. If the preview does not open after setup, use the **Ports** tab to open **Soccer Analytics** on port **5000**. Keep the port visibility set to **Private**.
-
-GitHub Codespaces has an included monthly quota on personal accounts. See [GitHub's Codespaces billing documentation](https://docs.github.com/en/billing/concepts/product-billing/github-codespaces) for limits and charges.
